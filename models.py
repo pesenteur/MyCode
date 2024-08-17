@@ -53,9 +53,9 @@ class PatternFlowBranch(nn.Module):
         x = self.norm_out(x)
         return x
 
-class PatternFlowNet(nn.Module):
+class MSIN(nn.Module):
     def __init__(self, num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads):
-        super(PatternFlowNet, self).__init__()
+        super(MSIN, self).__init__()
         self.branches = nn.ModuleList([PatternFlowBranch(input_dim, hidden_dim, branch_output_dim, num_heads, 4) for _ in range(num_branches)])
         self.transformer_encoder = nn.TransformerEncoder(
             nn.TransformerEncoderLayer(d_model=branch_output_dim, nhead=num_heads),
