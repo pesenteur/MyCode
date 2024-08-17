@@ -1,6 +1,5 @@
 import json
 import numpy as np
-import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn import linear_model
 from sklearn.model_selection import KFold

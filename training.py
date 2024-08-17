@@ -13,7 +13,7 @@ def load_data():
     mob_adj = np.load("./Data/actual_flow.npy")
     return pattern_list, torch.Tensor(mob_adj)
 
-def train_pattern_flow_model(input_tensor, label, criterion=None, model=None):
+def train(input_tensor, label, criterion=None, model=None):
     if criterion is None:
         criterion = MobilityLoss()
     if model is None:
@@ -49,4 +49,4 @@ def train_pattern_flow_model(input_tensor, label, criterion=None, model=None):
 
 if __name__ == '__main__':
     pattern_list, mob_adj = load_data()
-    train_pattern_flow_model(pattern_list, mob_adj)
+    train(pattern_list, mob_adj)
