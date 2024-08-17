@@ -35,7 +35,7 @@ def train_pattern_flow_model(input_tensor, label, criterion=None, model=None):
         optimizer.step()
 
         if epoch > 1750:
-            print(f"Epoch {epoch}, Loss {loss.item()}")
+            print(f"\nEpoch {epoch}, Loss {loss.item()}")
             embs = model.get_features()
             embs = embs.detach().numpy()
             results = perform_evaluation(embs)

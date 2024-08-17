@@ -70,7 +70,7 @@ def perform_evaluation(embs, display=True):
     nmi, ars = classify_land_usage(embs, display=display)
 
     if display:
-        print("### Summary ###\n")
+        print("### Summary ###")
         print(f"Popularity Prediction - MAE: {pop_mae:.2f}, RMSE: {pop_rmse:.2f}, R2: {pop_r2:.4f}")
         print(f"Check-in Prediction - MAE: {check_mae:.2f}, RMSE: {check_rmse:.2f}, R2: {check_r2:.4f}")
         print(f"Land Usage Prediction - NMI: {nmi:.4f}, ARS: {ars:.4f}")
