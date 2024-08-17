@@ -6,9 +6,11 @@ from evaluation_tasks import perform_evaluation
 import numpy as np
 
 def load_data():
-    mob_pattern = np.load("./Data/mob_pattern.npy")
+    mob_pattern = np.load("./Data/human_flow_p.npy")
     pattern_list = [torch.tensor(mob_pattern[i], dtype=torch.float) for i in range(mob_pattern.shape[0])]
-    mob_adj = np.load("./Data/mobility.npy")
+    road = np.load('Data/road_p.npy')
+    pattern_list.append(torch.tensor(road, dtype=torch.float))
+    mob_adj = np.load("./Data/actual_flow.npy")
     return pattern_list, torch.Tensor(mob_adj)
 
 def train_pattern_flow_model(input_tensor, label, criterion=None, model=None):

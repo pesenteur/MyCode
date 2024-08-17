@@ -68,7 +68,7 @@ class PatternFlowNet(nn.Module):
         self.decoder_t = nn.Linear(128, 128)
         self.feature = None
         self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, 512, 256)
-        adj_matrix = np.load('Data/adj_matrix.npy')
+        adj_matrix = np.load('Data/adjacency.npy')
         adj_matrix_sparse = sp.coo_matrix(adj_matrix)
         edge_index, _ = from_scipy_sparse_matrix(adj_matrix_sparse)
         self.edge_index = edge_index
