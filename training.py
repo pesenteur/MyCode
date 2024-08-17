@@ -1,6 +1,6 @@
 import torch
 import torch.optim as optim
-from models import PatternFlowNet
+from models import MSIN
 from custom_losses import MobilityLoss
 from evaluation_tasks import perform_evaluation
 import numpy as np
@@ -23,7 +23,7 @@ def train_pattern_flow_model(input_tensor, label, criterion=None, model=None):
         branch_output_dim = 120
         final_output_dim = 128
         num_heads = 8
-        model = PatternFlowNet(num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads)
+        model = MSIN(num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads)
 
     optimizer = optim.Adam(model.parameters(), lr=0.0005, weight_decay=5e-4)
     for epoch in range(1800):

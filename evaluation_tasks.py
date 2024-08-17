@@ -36,16 +36,16 @@ def evaluate_predictions(embs, labels, display=False):
     y_pred, y_test = k_fold_prediction(embs, labels)
     mae, rmse, r2 = compute_metrics(y_pred, y_test)
     if display:
-        print(f"MAE: {mae}")
-        print(f"RMSE: {rmse}")
-        print(f"R2: {r2}")
+        print(f"MAE: {mae:.2f}")
+        print(f"RMSE: {rmse:.2f}")
+        print(f"R2: {r2:.4f}")
     return mae, rmse, r2
 
 def classify_land_usage(emb, display=False):
     lu_label_filename = "./Data/landusage.json"
     cd = json.load(open(lu_label_filename))
     cd_labels = np.array([cd[str(i)] for i in range(69)])
-    kmeans = KMeans(n_clusters=14, random_state=3)
+    kmeans = KMeans(n_clusters=14, random_state=3,n_init=10)
     emb_labels = kmeans.fit_predict(emb)
     nmi = normalized_mutual_info_score(cd_labels, emb_labels)
     ars = adjusted_rand_score(cd_labels, emb_labels)
@@ -56,16 +56,23 @@ def classify_land_usage(emb, display=False):
 
 def perform_evaluation(embs, display=True):
     if display:
-        print("Popularity Prediction: ")
+        print("### Popularity Prediction ###")
     population_label = np.load("./Data/population.npy", allow_pickle=True)
     pop_mae, pop_rmse, pop_r2 = evaluate_predictions(embs, population_label, display=display)
 
     if display:
-        print("Check-in Prediction: ")
+        print("### Check-in Prediction ###")
     check_in_label = np.load("./Data/check_in.npy")
     check_mae, check_rmse, check_r2 = evaluate_predictions(embs, check_in_label, display=display)
 
     if display:
-        print("Land Usage Prediction: ")
+        print("### Land Usage Prediction ###")
     nmi, ars = classify_land_usage(embs, display=display)
+
+    if display:
+        print("### Summary ###\n")
+        print(f"Popularity Prediction - MAE: {pop_mae:.2f}, RMSE: {pop_rmse:.2f}, R2: {pop_r2:.4f}")
+        print(f"Check-in Prediction - MAE: {check_mae:.2f}, RMSE: {check_rmse:.2f}, R2: {check_r2:.4f}")
+        print(f"Land Usage Prediction - NMI: {nmi:.4f}, ARS: {ars:.4f}")
+
     return pop_mae, pop_rmse, pop_r2, check_mae, check_rmse, check_r2, nmi, ars
