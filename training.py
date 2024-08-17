@@ -23,18 +23,18 @@ def train(input_tensor, label, criterion=None, model=None):
         branch_output_dim = 120
         final_output_dim = 128
         num_heads = 8
+        epochs = 1800
         model = MSIN(num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads)
 
     optimizer = optim.Adam(model.parameters(), lr=0.0005, weight_decay=5e-4)
-    for epoch in range(1800):
+    for epoch in range(epochs):
         model.train()
         s_out, t_out = model(input_tensor)
         loss = criterion(s_out, t_out, label)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
-        if epoch > 1750:
+        if epoch > epochs-50 or epoch %50 == 0:
             print(f"\nEpoch {epoch}, Loss {loss.item()}")
             embs = model.get_features()
             embs = embs.detach().numpy()
