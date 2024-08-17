@@ -34,7 +34,7 @@ def train(input_tensor, label, criterion=None, model=None):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if epoch > epochs-50 or epoch %50 == 0:
+        if epoch %50 == 0:
             print(f"\nEpoch {epoch}, Loss {loss.item()}")
             embs = model.get_features()
             embs = embs.detach().numpy()
