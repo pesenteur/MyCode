@@ -79,7 +79,7 @@ class PatternGraphNet(nn.Module):
         self.decoder_t = nn.Linear(128, 128)
         self.feature = None
         self.sageconv = GraphSAGE(branch_output_dim * num_graphs, 512, 256)
-        adj_matrix = np.load('adj_matrix.npy')
+        adj_matrix = np.load('Data/adj_matrix.npy')
         adj_matrix_sparse = sp.coo_matrix(adj_matrix)
         edge_index, edge_attr = from_scipy_sparse_matrix(adj_matrix_sparse)
         self.edge_index = edge_index
@@ -149,7 +149,7 @@ def _mob_loss(s_embeddings, t_embeddings, mob):
     softmax1 = nn.Softmax(dim=-1)
     phat = softmax1(inner_prod)
     loss = torch.sum(-torch.mul(mob, torch.log(phat+0.0001)))
-    inner_prod = pairwise_inner_product(t_embeddings, s_embeddings)
+    inner_prod = inner_product(t_embeddings, s_embeddings)
     softmax2 = nn.Softmax(dim=-1)
     phat = softmax2(inner_prod)
     loss += torch.sum(-torch.mul(torch.transpose(mob, 0, 1), torch.log(phat+0.0001)))
@@ -167,7 +167,7 @@ class SimLoss(nn.Module):
 
 
 def train_model(input_tensor, label, criterion=None, model=None):
-    road = np.load('NewData/road_matrix.npy')
+    road = np.load('Data/road_matrix.npy')
     input_tensor.append(torch.tensor(road, dtype=torch.float))
     epochs = 1800
     learning_rate = 0.0005
