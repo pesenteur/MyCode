@@ -30,9 +30,9 @@ class GCNModel(nn.Module):
         x = self.conv2(x, edge_index)
         return x
 
-class PatternFlowBranch(nn.Module):
+class IntraGraph(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_heads, num_attention_layers):
-        super(PatternFlowBranch, self).__init__()
+        super(IntraGraph, self).__init__()
         self.fc1 = nn.Linear(input_dim, hidden_dim)
         self.attentions = nn.ModuleList([nn.MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads) for _ in range(num_attention_layers)])
         self.fc2 = nn.Linear(hidden_dim, output_dim)
@@ -53,15 +53,29 @@ class PatternFlowBranch(nn.Module):
         x = self.norm_out(x)
         return x
 
+class InterGraph(nn.Module):
+    def __init__(self, branch_output_dim, num_heads, num_layers):
+        super(InterGraph, self).__init__()
+        self.transformer_encoder = nn.TransformerEncoder(
+            nn.TransformerEncoderLayer(d_model=branch_output_dim, nhead=num_heads, batch_first=True),
+            num_layers=num_layers
+        )
+        self.final_norm = nn.LayerNorm(branch_output_dim * num_heads)
+        
+    def forward(self, branch_outputs):
+        # branch_outputs: (batch_size, num_branches, branch_output_dim)
+        branch_outputs = branch_outputs.permute(1, 0, 2)  # (num_branches, batch_size, branch_output_dim)
+        transformer_out = self.transformer_encoder(branch_outputs)
+        transformer_out = transformer_out.permute(1, 0, 2)  # (batch_size, num_branches, branch_output_dim)
+        concatenated = transformer_out.contiguous().view(transformer_out.size(0), -1)  # (batch_size, branch_output_dim * num_branches)
+        out = self.final_norm(concatenated)
+        return out
+
 class MSIN(nn.Module):
     def __init__(self, num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads):
         super(MSIN, self).__init__()
-        self.branches = nn.ModuleList([PatternFlowBranch(input_dim, hidden_dim, branch_output_dim, num_heads, 4) for _ in range(num_branches)])
-        self.transformer_encoder = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(d_model=branch_output_dim, nhead=num_heads),
-            num_layers=4
-        )
-        self.final_norm = nn.LayerNorm(branch_output_dim * num_branches)
+        self.branches = nn.ModuleList([IntraGraph(input_dim, hidden_dim, branch_output_dim, num_heads, 4) for _ in range(num_branches)])
+        self.inter_graph = InterGraph(branch_output_dim, num_heads, num_layers=4)
         self.dropout = nn.Dropout(p=0.5)
         self.fc = DeepFeedForward(256, 128)
         self.decoder_s = nn.Linear(128, 128)
@@ -77,12 +91,7 @@ class MSIN(nn.Module):
         branch_outputs = [branch(graph) for branch, graph in zip(self.branches, graphs)]  # (batch_size, branch_output_dim)
         branch_outputs = torch.stack(branch_outputs, dim=1)  # (batch_size, num_branches, branch_output_dim)
         
-        branch_outputs = branch_outputs.permute(1, 0, 2)  # (num_branches, batch_size, branch_output_dim)
-        transformer_out = self.transformer_encoder(branch_outputs)
-        transformer_out = transformer_out.permute(1, 0, 2)  # (batch_size, num_branches, branch_output_dim)
-        concatenated = transformer_out.contiguous().view(transformer_out.size(0), -1)  # (batch_size, branch_output_dim * num_branches)
-        
-        out = self.final_norm(concatenated)
+        out = self.inter_graph(branch_outputs)
         out = self.sageconv(out, self.edge_index)
 
         out = self.fc(out)
