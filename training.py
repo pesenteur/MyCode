@@ -18,7 +18,8 @@ def train(input_tensor, label, criterion=None, model=None):
         criterion = MobilityLoss()
     if model is None:
         num_branches = 8
-        input_dim = 69
+        #region 
+        input_dim = 180
         hidden_dim = 128
         branch_output_dim = 120
         final_output_dim = 128

@@ -41,7 +41,7 @@ def evaluate_predictions(embs, labels, display=False):
     return mae, rmse, r2
 
 def classify_land_usage(emb, display=False):
-    lu_label_filename = "./Data/landusage.json"
+    lu_label_filename = "./Data_180/landusage.json"
     cd = json.load(open(lu_label_filename))
     cd_labels = np.array([cd[str(i)] for i in range(69)])
     kmeans = KMeans(n_clusters=14, random_state=3,n_init=10)
@@ -56,12 +56,12 @@ def classify_land_usage(emb, display=False):
 def perform_evaluation(embs, display=True):
     if display:
         print("### Popularity Prediction ###")
-    population_label = np.load("./Data/population.npy", allow_pickle=True)
+    population_label = np.load("./Data_180/crime_counts.npy", allow_pickle=True)
     pop_mae, pop_rmse, pop_r2 = evaluate_predictions(embs, population_label, display=display)
 
     if display:
         print("### Check-in Prediction ###")
-    check_in_label = np.load("./Data/check_in.npy")
+    check_in_label = np.load("./Data_180/check_in.npy")
     check_mae, check_rmse, check_r2 = evaluate_predictions(embs, check_in_label, display=display)
 
     if display:
