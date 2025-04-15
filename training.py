@@ -5,12 +5,12 @@ from custom_losses import MobilityLoss
 from evaluation_tasks import perform_evaluation
 import numpy as np
 
-def load_data():
-    mob_pattern = np.load("./Data/human_flow_p.npy")
+def load_Data_180():
+    mob_pattern = np.load("./Data_180/human_flow_p.npy")
     pattern_list = [torch.tensor(mob_pattern[i], dtype=torch.float) for i in range(mob_pattern.shape[0])]
-    road = np.load('Data/path_p.npy')
+    road = np.load('Data_180/path_p.npy')
     pattern_list.append(torch.tensor(road, dtype=torch.float))
-    mob_adj = np.load("./Data/actual_flow.npy")
+    mob_adj = np.load("./Data_180/actual_flow.npy")
     return pattern_list, torch.Tensor(mob_adj)
 
 def train(input_tensor, label, criterion=None, model=None):
@@ -49,5 +49,5 @@ def train(input_tensor, label, criterion=None, model=None):
             #     writer.writerow(results)
 
 if __name__ == '__main__':
-    pattern_list, mob_adj = load_data()
+    pattern_list, mob_adj = load_Data_180()
     train(pattern_list, mob_adj)
