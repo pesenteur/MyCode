@@ -57,7 +57,7 @@ class InterGraph(nn.Module):
     def __init__(self, branch_output_dim, num_heads, num_layers):
         super(InterGraph, self).__init__()
         self.transformer_encoder = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(d_model=branch_output_dim, nhead=num_heads, batch_first=True),
+            nn.TransformerEncoderLayer(d_model=branch_output_dim, nhead=num_heads),
             num_layers=num_layers
         )
         self.final_norm = nn.LayerNorm(branch_output_dim * num_heads)
