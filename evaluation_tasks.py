@@ -43,7 +43,7 @@ def evaluate_predictions(embs, labels, display=False):
 def classify_land_usage(emb, display=False):
     lu_label_filename = "./Data_180/landusage.json"
     cd = json.load(open(lu_label_filename))
-    cd_labels = np.array([cd[str(i)] for i in range(69)])
+    cd_labels = np.array([cd[str(i)] for i in range(180)])
     kmeans = KMeans(n_clusters=14, random_state=3,n_init=10)
     emb_labels = kmeans.fit_predict(emb)
     nmi = normalized_mutual_info_score(cd_labels, emb_labels)
