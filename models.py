@@ -82,10 +82,11 @@ class MSIN(nn.Module):
         self.decoder_t = nn.Linear(128, 128)
         self.feature = None
         self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, 512, 256)
-        adj_matrix = np.load('Data/adjacency.npy')
+        adj_matrix = np.load('Data_180/adjacency.npy')
         adj_matrix_sparse = sp.coo_matrix(adj_matrix)
-        edge_index, _ = from_scipy_sparse_matrix(adj_matrix_sparse)
+        edge_index, edge_attr = from_scipy_sparse_matrix(adj_matrix_sparse)
         self.edge_index = edge_index
+        self.edge_attr = edge_attr
 
     def forward(self, graphs):
         branch_outputs = [branch(graph) for branch, graph in zip(self.branches, graphs)]  # (batch_size, branch_output_dim)
