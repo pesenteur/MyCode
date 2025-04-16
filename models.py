@@ -78,11 +78,11 @@ class MSIN(nn.Module):
         self.branches = nn.ModuleList([IntraGraph(input_dim, hidden_dim, branch_output_dim, num_heads, 4) for _ in range(num_branches)])
         self.inter_graph = InterGraph(branch_output_dim, num_heads, num_layers=4)
         self.dropout = nn.Dropout(p=0.5)
-        self.fc = DeepFeedForward(256, 128)
+        self.fc = DeepFeedForward(128, 128)
         self.decoder_s = nn.Linear(128, 128)
         self.decoder_t = nn.Linear(128, 128)
         self.feature = None
-        self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, 512, 256)
+        self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, 256, 128)
         edge_index, edge_attr = load_graph_data()
         self.edge_index = edge_index
         self.edge_attr = edge_attr
@@ -110,7 +110,6 @@ class DeepFeedForward(nn.Module):
         super(DeepFeedForward, self).__init__()
         self.model = nn.Sequential(
             nn.Linear(input_dim, input_dim * 2),
-            nn.Linear(input_dim * 2, input_dim * 2),
             nn.LeakyReLU(negative_slope=0.3, inplace=True),
             nn.Linear(input_dim * 2, output_dim),
             nn.LeakyReLU(negative_slope=0.3, inplace=True),
