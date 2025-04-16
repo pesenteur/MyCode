@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import SAGEConv, GCNConv
 from torch_geometric.utils import from_scipy_sparse_matrix
+from data_utils import random_neighbor_sampling,load_graph_data
 import numpy as np
 import scipy.sparse as sp
 
@@ -82,9 +83,7 @@ class MSIN(nn.Module):
         self.decoder_t = nn.Linear(128, 128)
         self.feature = None
         self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, 512, 256)
-        adj_matrix = np.load('Data_180/adjacency.npy')
-        adj_matrix_sparse = sp.coo_matrix(adj_matrix)
-        edge_index, edge_attr = from_scipy_sparse_matrix(adj_matrix_sparse)
+        edge_index, edge_attr = load_graph_data()
         self.edge_index = edge_index
         self.edge_attr = edge_attr
 
@@ -93,7 +92,7 @@ class MSIN(nn.Module):
         branch_outputs = torch.stack(branch_outputs, dim=1)  # (batch_size, num_branches, branch_output_dim)
         
         out = self.inter_graph(branch_outputs)
-        out = self.sageconv(out, self.edge_index)
+        out = self.sageconv(out, random_neighbor_sampling(self.edge_index,self.edge_attr))
 
         out = self.fc(out)
         self.feature = out
@@ -125,3 +124,5 @@ class DeepFeedForward(nn.Module):
 
     def get_output(self):
         return self.output
+
+
