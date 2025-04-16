@@ -11,7 +11,7 @@ import numpy as np
 import scipy.sparse as sp
 
 def load_graph_data():
-    adj_matrix = np.load('Data/adj_matrix.npy')
+    adj_matrix = np.load('Data_180/adjacency.npy')
     path_p = np.load('Data_180/path_p.npy')
     adj_matrix_sparse = sp.coo_matrix(adj_matrix*path_p)
     edge_index, edge_value = from_scipy_sparse_matrix(adj_matrix_sparse)
