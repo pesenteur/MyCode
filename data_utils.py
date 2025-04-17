@@ -17,7 +17,7 @@ def load_graph_data():
     edge_index, edge_value = from_scipy_sparse_matrix(adj_matrix_sparse)
     return edge_index,edge_value
 
-def random_neighbor_sampling(edge_index, edge_attr, max_neighbors=3):
+def random_neighbor_sampling(edge_index, edge_attr, max_neighbors=5):
     """
     随机从每个节点的邻居中选择一定数量的边。
 
