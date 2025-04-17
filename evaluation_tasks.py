@@ -56,8 +56,20 @@ def classify_land_usage(emb, display=False):
 def perform_evaluation(embs, display=True):
     if display:
         print("### Popularity Prediction ###")
-    population_label = np.load("./Data_180/crime_counts.npy", allow_pickle=True)
+    population_label = np.load("./Data_180/population.npy", allow_pickle=True)
     pop_mae, pop_rmse, pop_r2 = evaluate_predictions(embs, population_label, display=display)
+
+    if display:
+        print("### Crime Prediction ###")
+    crime_label = np.load("./Data_180/crime_counts.npy", allow_pickle=True)
+    cri_mae, cri_rmse, cri_r2 = evaluate_predictions(embs, crime_label, display=display)
+
+    if display:
+        print("### Call Prediction ###")
+    call_label = np.load("./Data_180/serviceCall_counts.npy", allow_pickle=True)
+    call_mae, call_rmse, call_r2 = evaluate_predictions(embs, call_label, display=display)
+
+
 
     if display:
         print("### Check-in Prediction ###")
