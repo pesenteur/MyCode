@@ -69,8 +69,6 @@ def perform_evaluation(embs, display=True):
     call_label = np.load("./Data_180/serviceCall_counts.npy", allow_pickle=True)
     call_mae, call_rmse, call_r2 = evaluate_predictions(embs, call_label, display=display)
 
-
-
     if display:
         print("### Check-in Prediction ###")
     check_in_label = np.load("./Data_180/check_in.npy")
@@ -86,4 +84,4 @@ def perform_evaluation(embs, display=True):
         print(f"Check-in Prediction - MAE: {check_mae:.2f}, RMSE: {check_rmse:.2f}, R2: {check_r2:.4f}")
         print(f"Land Usage Prediction - NMI: {nmi:.4f}, ARS: {ars:.4f}")
 
-    return pop_mae, pop_rmse, pop_r2, check_mae, check_rmse, check_r2, nmi, ars
+    return pop_mae, pop_rmse, pop_r2,cri_mae, cri_rmse, cri_r2, call_mae, call_rmse, call_r2,check_mae, check_rmse, check_r2, nmi, ars
