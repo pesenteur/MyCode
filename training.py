@@ -10,7 +10,7 @@ def load_Data_180():
     pattern_list = [torch.tensor(mob_pattern[i], dtype=torch.float) for i in range(mob_pattern.shape[0])]
     road = np.load('Data_180/path_p.npy')
     pattern_list.append(torch.tensor(road, dtype=torch.float))
-    mob_adj = np.load("./Data_180/HAU_adj.npy")
+    mob_adj = np.load("./Data_180/actual_flow.npy")
     return pattern_list, torch.Tensor(mob_adj)
 
 def train(input_tensor, label, criterion=None, model=None):
