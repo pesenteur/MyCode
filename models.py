@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import SAGEConv, GCNConv
 from torch_geometric.utils import from_scipy_sparse_matrix
-from data_utils import random_neighbor_sampling,load_graph_data
+from data_utils import random_neighbor_sampling,load_graph_data,load_path_data
 import numpy as np
 import scipy.sparse as sp
 
@@ -13,6 +13,10 @@ class CustomMultiheadAttention(nn.MultiheadAttention):
         super(CustomMultiheadAttention, self).__init__(embed_dim, num_heads, **kwargs)
         self.gate_dim = embed_dim  # 门机制的维度，如果为 None 则不启用门
         self.gate_fc = nn.Linear(embed_dim, embed_dim)
+        self.two_dim_bias = torch.tensor(load_path_data(), dtype=torch.float32)
+        self.a = nn.Parameter(torch.tensor(0.5))  # 默认值为 0.5
+        self.b = 1.0 - self.a  # b 是 1 - a，保证 a + b = 1
+
 
     def forward(self,query, key, value, key_padding_mask=None, need_weights=True, attn_mask=None, average_attn_weights=True, is_causal=False):
         """
@@ -31,7 +35,8 @@ class CustomMultiheadAttention(nn.MultiheadAttention):
 
         # 如果使用了门机制，输出时乘回门控制系数
         attn_output = attn_output * gate  # 将门控制系数乘回到输出上
-        
+        attn_output_weights = attn_output_weights*self.a + self.two_dim_bias*self.b
+
         return attn_output, attn_output_weights
 
 

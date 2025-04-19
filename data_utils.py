@@ -10,6 +10,22 @@ from torch_geometric.utils import from_scipy_sparse_matrix
 import numpy as np
 import scipy.sparse as sp
 
+
+
+def standardize_matrix(matrix):
+    # 计算每列的均值和标准差
+    mean = np.mean(matrix, axis=0)
+    std = np.std(matrix, axis=0)
+    
+    # 对每列进行标准化
+    standardized_matrix = (matrix - mean) / std
+    return standardized_matrix
+
+def load_path_data():
+    path_p = np.load('Data_180/path_p.npy')
+    path_p = standardize_matrix(path_p)
+    return path_p.reshape(1, 180, 180)
+
 def load_graph_data():
     adj_matrix = np.load('Data_180/adjacency.npy')
     path_p = np.load('Data_180/path_p.npy')
