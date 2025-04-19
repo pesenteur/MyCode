@@ -41,16 +41,13 @@ def train(input_tensor, label, criterion=None, model=None):
         embs = model.get_features()
         embs = embs.detach().numpy()
         
-        pop_mae, pop_rmse, pop_r2,cri_mae, cri_rmse, cri_r2, call_mae, call_rmse, call_r2,check_mae, check_rmse, check_r2, nmi, ars = perform_evaluation(embs,False)
-        if cri_r2>b_crime_r2:
-            b_crime_r2 = cri_r2
-        if call_r2>b_call_r2:
-            b_call_r2=call_r2
-        if check_r2>b_check_r2:
-            b_check_r2=check_r2
+        
+
         if epoch %25 == 0:
             print(f"\nEpoch {epoch}, Loss {loss.item()}")
-            
+            pop_mae, pop_rmse, pop_r2,cri_mae, cri_rmse, cri_r2, call_mae, call_rmse, call_r2,check_mae, check_rmse, check_r2, nmi, ars = perform_evaluation(embs,True)
+        else:
+            pop_mae, pop_rmse, pop_r2,cri_mae, cri_rmse, cri_r2, call_mae, call_rmse, call_r2,check_mae, check_rmse, check_r2, nmi, ars = perform_evaluation(embs,False)
             # Save results to CSV
             # file_exists = os.path.isfile('results.csv')
             # with open('results.csv', 'a', newline='') as csvfile:
@@ -58,6 +55,12 @@ def train(input_tensor, label, criterion=None, model=None):
             #     if not file_exists:
             #         writer.writerow(columns)
             #     writer.writerow(results)
+        if cri_r2>b_crime_r2:
+            b_crime_r2 = cri_r2
+        if call_r2>b_call_r2:
+            b_call_r2=call_r2
+        if check_r2>b_check_r2:
+            b_check_r2=check_r2
     print("### Best ###")
     print(f"check-in Prediction -  R2: {b_check_r2:.4f}")
     print(f"crime Prediction - R2: {b_crime_r2:.4f}")
