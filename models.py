@@ -7,6 +7,36 @@ from data_utils import random_neighbor_sampling,load_graph_data
 import numpy as np
 import scipy.sparse as sp
 
+class CustomMultiheadAttention(nn.MultiheadAttention):
+    def __init__(self, embed_dim, num_heads, **kwargs):
+        # 调用父类的构造函数
+        super(CustomMultiheadAttention, self).__init__(embed_dim, num_heads, **kwargs)
+        self.gate_dim = embed_dim  # 门机制的维度，如果为 None 则不启用门
+        self.gate_fc = nn.Linear(embed_dim, embed_dim)
+
+    def forward(self,query, key, value, key_padding_mask=None, need_weights=True, attn_mask=None, average_attn_weights=True, is_causal=False):
+        """
+        在原始多头注意力的基础上引入门（gate）机制：
+        1. 生成门控制系数（gate），控制输入的流动
+        2. 将门控制系数应用到输入（Query、Key、Value等）
+        3. 执行多头注意力计算
+        """
+        # 如果启用了门机制
+        gate = torch.sigmoid(self.gate_fc(query))  # (seq_len, batch_size, gate_dim)
+        # 将门控制系数和原始输入相乘（按元素相乘）
+        # query = query * gate  # query 的每个元素会按门系数缩放
+
+        # 调用父类的 forward 方法计算标准的多头注意力
+        attn_output, attn_output_weights = super().forward(query, key, value, key_padding_mask=None, need_weights=True, attn_mask=None, average_attn_weights=True, is_causal=False)
+
+        # 如果使用了门机制，输出时乘回门控制系数
+        attn_output = attn_output * gate  # 将门控制系数乘回到输出上
+        
+        return attn_output, attn_output_weights
+
+
+
+
 class GraphSAGEModel(nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels):
         super(GraphSAGEModel, self).__init__()
@@ -35,7 +65,7 @@ class IntraGraph(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_heads, num_attention_layers):
         super(IntraGraph, self).__init__()
         self.fc1 = nn.Linear(input_dim, hidden_dim)
-        self.attentions = nn.ModuleList([nn.MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads) for _ in range(num_attention_layers)])
+        self.attentions = nn.ModuleList([CustomMultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads) for _ in range(num_attention_layers)])
         self.fc2 = nn.Linear(hidden_dim, output_dim)
         self.norms = nn.ModuleList([nn.LayerNorm(hidden_dim) for _ in range(num_attention_layers)])
         self.norm_out = nn.LayerNorm(output_dim)
