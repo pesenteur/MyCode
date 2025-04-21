@@ -40,8 +40,6 @@ def train(input_tensor, label, criterion=None, model=None):
         optimizer.step()
         embs = model.get_features()
         embs = embs.detach().numpy()
-        
-        
 
         if epoch %25 == 0:
             print(f"\nEpoch {epoch}, Loss {loss.item()}")

@@ -19,12 +19,7 @@ class CustomMultiheadAttention(nn.MultiheadAttention):
 
 
     def forward(self,query, key, value, key_padding_mask=None, need_weights=True, attn_mask=None, average_attn_weights=True, is_causal=False):
-        """
-        在原始多头注意力的基础上引入门（gate）机制：
-        1. 生成门控制系数（gate），控制输入的流动
-        2. 将门控制系数应用到输入（Query、Key、Value等）
-        3. 执行多头注意力计算
-        """
+
         # 如果启用了门机制
         gate = torch.sigmoid(self.gate_fc(query))  # (seq_len, batch_size, gate_dim)
         # 将门控制系数和原始输入相乘（按元素相乘）
@@ -113,11 +108,13 @@ class MSIN(nn.Module):
         self.branches = nn.ModuleList([IntraGraph(input_dim, hidden_dim, branch_output_dim, num_heads, 4) for _ in range(num_branches)])
         self.inter_graph = InterGraph(branch_output_dim, num_heads, num_layers=4)
         self.dropout = nn.Dropout(p=0.5)
-        self.fc = DeepFeedForward(128, 128)
-        self.decoder_s = nn.Linear(128, 128)
-        self.decoder_t = nn.Linear(128, 128)
+        self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, final_output_dim*2, final_output_dim)
+
+        self.fc = DeepFeedForward(final_output_dim, final_output_dim)
+        self.decoder_s = nn.Linear(final_output_dim, final_output_dim)
+        self.decoder_t = nn.Linear(final_output_dim, final_output_dim)
         self.feature = None
-        self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, 256, 128)
+        
         edge_index, edge_attr = load_graph_data()
         self.edge_index = edge_index
         self.edge_attr = edge_attr
