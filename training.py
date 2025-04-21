@@ -69,6 +69,8 @@ def train(input_tensor, label, criterion=None, model=None):
     print(f"check-in Prediction -  R2: {b_check_r2:.4f}")
     print(f"crime Prediction - R2: {b_crime_r2:.4f}")
     print(f"call Prediction - R2: {b_call_r2:.4f}")
+    print(f"nmi Prediction - R2: {b_nmi:.4f}")
+    print(f"ars Prediction - R2: {b_ars:.4f}")
 
 
 if __name__ == '__main__':
