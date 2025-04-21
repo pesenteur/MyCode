@@ -54,10 +54,10 @@ def classify_land_usage(emb, display=False):
     return nmi, ars
 
 def perform_evaluation(embs, display=True):
-    # if display:
-    #     print("### Popularity Prediction ###")
-    # population_label = np.load("./Data_180/population.npy", allow_pickle=True)
-    # pop_mae, pop_rmse, pop_r2 = evaluate_predictions(embs, population_label, display=display)
+    if display:
+        print("### Popularity Prediction ###")
+    population_label = np.load("./Data_180/population.npy", allow_pickle=True)
+    pop_mae, pop_rmse, pop_r2 = evaluate_predictions(embs, population_label, display=display)
 
     if display:
         print("### Crime Prediction ###")
