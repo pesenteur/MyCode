@@ -17,6 +17,8 @@ def train(input_tensor, label, criterion=None, model=None):
     b_check_r2 = 0
     b_crime_r2 = 0
     b_call_r2 = 0
+    b_nmi = 0
+    b_ars = 0
     if criterion is None:
         criterion = MobilityLoss()
     if model is None:
@@ -59,6 +61,10 @@ def train(input_tensor, label, criterion=None, model=None):
             b_call_r2=call_r2
         if check_r2>b_check_r2:
             b_check_r2=check_r2
+        if nmi>b_nmi:
+            b_nmi = nmi
+        if ars>b_ars:
+            b_ars = ars
     print("### Best ###")
     print(f"check-in Prediction -  R2: {b_check_r2:.4f}")
     print(f"crime Prediction - R2: {b_crime_r2:.4f}")
