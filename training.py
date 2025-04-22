@@ -25,8 +25,8 @@ def train(input_tensor, label, criterion=None, model=None):
         num_branches = 8
         #region 
         input_dim = 180
-        hidden_dim = 128
-        branch_output_dim = 120
+        hidden_dim = 144
+        branch_output_dim = 144
         final_output_dim = 144
         num_heads = 8
         epochs = 2000

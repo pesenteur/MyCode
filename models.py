@@ -142,9 +142,9 @@ class DeepFeedForward(nn.Module):
         super(DeepFeedForward, self).__init__()
         self.model = nn.Sequential(
             nn.Linear(input_dim, input_dim * 2),
-            nn.LeakyReLU(negative_slope=0.3, inplace=True),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
             nn.Linear(input_dim * 2, output_dim),
-            nn.LeakyReLU(negative_slope=0.3, inplace=True),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
         )
         self.output = None
 
