@@ -11,15 +11,9 @@ class MobilityCNN(nn.Module):
     def __init__(self, in_channels=3, out_channels=1):
         super(MobilityCNN, self).__init__()
         self.cnn = nn.Sequential(
-            nn.Conv2d(in_channels, 16, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels, 8, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.BatchNorm2d(16),
-
-            nn.Conv2d(16, 32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.BatchNorm2d(32),
-
-            nn.Conv2d(32, out_channels, kernel_size=1)  # 输出通道为1
+            nn.Conv2d(8, out_channels, kernel_size=1)
         )
 
     def forward(self, x):  # x: (B, 3, 180, 180)
