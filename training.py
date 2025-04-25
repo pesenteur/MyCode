@@ -6,14 +6,20 @@ from evaluation_tasks import perform_evaluation
 import numpy as np
 
 
-
 def load_Data_180():
-    mob_pattern = np.load("./Data_180/mob_patterns_3channel.npy")
-    pattern_list = [torch.tensor(mob_pattern[i], dtype=torch.float) for i in range(mob_pattern.shape[0])]
-    road = np.load('Data_180/path_p.npy')
-    # pattern_list.append(torch.tensor(road, dtype=torch.float))
-    mob_adj = np.load("./Data_180/actual_flow.npy")
-    return pattern_list, torch.Tensor(mob_adj),torch.tensor(road, dtype=torch.float)
+    # 加载三通道 mobility pattern（7, 3, 180, 180）
+    mob_pattern = np.load("./Data_180/mob_patterns_3channel.npy")  # shape: (7, 3, 180, 180)
+    pattern_tensor = torch.tensor(mob_pattern, dtype=torch.float)  # 转为 PyTorch 张量
+
+    # 加载邻接矩阵（区域流动图）
+    mob_adj = np.load("./Data_180/actual_flow.npy")  # shape: (180, 180)
+    mob_adj_tensor = torch.tensor(mob_adj, dtype=torch.float)
+
+    # 加载路径数据
+    road = np.load("./Data_180/path_p.npy")  # shape: (180, 180)
+    road_tensor = torch.tensor(road, dtype=torch.float)
+
+    return pattern_tensor, mob_adj_tensor, road_tensor
 
 def train(input_tensor, label, path, criterion=None, model=None):
     b_check_r2 = 0

@@ -139,11 +139,17 @@ class MSIN(nn.Module):
         self.edge_attr = edge_attr
 
     def forward(self, graphs,path):
-        cnn_out = self.cnn_encoder(graphs)  # (7, 1, 180, 180)
-        cnn_out = cnn_out.squeeze(1)
-        cnn_out.append(path)
-        branch_outputs = [branch(graph) for branch, graph in zip(self.branches, cnn_out)]  # (batch_size, branch_output_dim)
-        branch_outputs = torch.stack(branch_outputs, dim=1)  # (batch_size, num_branches, branch_output_dim)
+        cnn_out = self.cnn_encoder(graphs)  # shape: (7, 1, 180, 180)
+        cnn_out = cnn_out.squeeze(1)        # shape: (7, 180, 180)
+
+        # 2. 添加 path 图 → shape: (8, 180, 180)
+        path = path.unsqueeze(0)            # shape: (1, 180, 180)
+        all_graphs = torch.cat([cnn_out, path], dim=0)  # (8, 180, 180)
+
+        # 3. 对每个图走 IntraGraph（注意图数量和 branches 数要匹配）
+        branch_outputs = [branch(graph) for branch, graph in zip(self.branches, all_graphs)]
+        branch_outputs = torch.stack(branch_outputs, dim=1)  # (180, num_branches, branch_output_dim)
+
         
         out = self.inter_graph(branch_outputs)
         out = self.sageconv(out, random_neighbor_sampling(self.edge_index,self.edge_attr))
