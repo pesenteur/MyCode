@@ -7,6 +7,24 @@ from data_utils import random_neighbor_sampling,load_graph_data,load_path_data
 import numpy as np
 import scipy.sparse as sp
 
+class MobilityCNN(nn.Module):
+    def __init__(self, in_channels=3, out_channels=1):
+        super(MobilityCNN, self).__init__()
+        self.cnn = nn.Sequential(
+            nn.Conv2d(in_channels, 16, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(16),
+
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+
+            nn.Conv2d(32, out_channels, kernel_size=1)  # 输出通道为1
+        )
+
+    def forward(self, x):  # x: (B, 3, 180, 180)
+        return self.cnn(x)  # (B, 1, 180, 180)
+
 class CustomMultiheadAttention(nn.MultiheadAttention):
     def __init__(self, embed_dim, num_heads, **kwargs):
         # 调用父类的构造函数
@@ -105,6 +123,7 @@ class InterGraph(nn.Module):
 class MSIN(nn.Module):
     def __init__(self, num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads):
         super(MSIN, self).__init__()
+        self.cnn_encoder = MobilityCNN(in_channels=3, out_channels=1)
         self.branches = nn.ModuleList([IntraGraph(input_dim, hidden_dim, branch_output_dim, num_heads, 4) for _ in range(num_branches)])
         self.inter_graph = InterGraph(branch_output_dim, num_heads, num_layers=4)
         self.dropout = nn.Dropout(p=0.5)
@@ -119,8 +138,11 @@ class MSIN(nn.Module):
         self.edge_index = edge_index
         self.edge_attr = edge_attr
 
-    def forward(self, graphs):
-        branch_outputs = [branch(graph) for branch, graph in zip(self.branches, graphs)]  # (batch_size, branch_output_dim)
+    def forward(self, graphs,path):
+        cnn_out = self.cnn_encoder(graphs)  # (7, 1, 180, 180)
+        cnn_out = cnn_out.squeeze(1)
+        cnn_out.append(path)
+        branch_outputs = [branch(graph) for branch, graph in zip(self.branches, cnn_out)]  # (batch_size, branch_output_dim)
         branch_outputs = torch.stack(branch_outputs, dim=1)  # (batch_size, num_branches, branch_output_dim)
         
         out = self.inter_graph(branch_outputs)

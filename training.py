@@ -5,15 +5,17 @@ from custom_losses import MobilityLoss
 from evaluation_tasks import perform_evaluation
 import numpy as np
 
+
+
 def load_Data_180():
-    mob_pattern = np.load("./Data_180/human_flow_p.npy")
+    mob_pattern = np.load("./Data_180/mob_patterns_3channel.npy")
     pattern_list = [torch.tensor(mob_pattern[i], dtype=torch.float) for i in range(mob_pattern.shape[0])]
     road = np.load('Data_180/path_p.npy')
-    pattern_list.append(torch.tensor(road, dtype=torch.float))
+    # pattern_list.append(torch.tensor(road, dtype=torch.float))
     mob_adj = np.load("./Data_180/actual_flow.npy")
-    return pattern_list, torch.Tensor(mob_adj)
+    return pattern_list, torch.Tensor(mob_adj),torch.tensor(road, dtype=torch.float)
 
-def train(input_tensor, label, criterion=None, model=None):
+def train(input_tensor, label, path, criterion=None, model=None):
     b_check_r2 = 0
     b_crime_r2 = 0
     b_call_r2 = 0
@@ -35,7 +37,7 @@ def train(input_tensor, label, criterion=None, model=None):
     optimizer = optim.Adam(model.parameters(), lr=0.0005, weight_decay=5e-4)
     for epoch in range(epochs):
         model.train()
-        s_out, t_out = model(input_tensor)
+        s_out, t_out = model(input_tensor,path)
         loss = criterion(s_out, t_out, label)
         optimizer.zero_grad()
         loss.backward()
@@ -74,5 +76,5 @@ def train(input_tensor, label, criterion=None, model=None):
 
 
 if __name__ == '__main__':
-    pattern_list, mob_adj = load_Data_180()
-    train(pattern_list, mob_adj)
+    pattern_list, mob_adj, path = load_Data_180()
+    train(pattern_list, mob_adj,path)
