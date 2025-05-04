@@ -5,20 +5,23 @@ from custom_losses import MobilityLoss
 from evaluation_tasks import perform_evaluation
 import numpy as np
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Using device:", device)
+
 
 def load_Data_180():
     # 加载三通道 mobility pattern（7, 3, 180, 180）
     mob_pattern = np.load("./Data_180/mob_patterns_3channel.npy")  # shape: (7, 3, 180, 180)
     pattern_tensor = torch.tensor(mob_pattern, dtype=torch.float)  # 转为 PyTorch 张量
-
+    pattern_tensor = pattern_tensor.to(device)
     # 加载邻接矩阵（区域流动图）
     mob_adj = np.load("./Data_180/actual_flow.npy")  # shape: (180, 180)
     mob_adj_tensor = torch.tensor(mob_adj, dtype=torch.float)
-
+    mob_adj_tensor = mob_adj_tensor.to(device)
     # 加载路径数据
     road = np.load("./Data_180/path_p.npy")  # shape: (180, 180)
     road_tensor = torch.tensor(road, dtype=torch.float)
-
+    road_tensor =road_tensor.to(device)
     return pattern_tensor, mob_adj_tensor, road_tensor
 
 def train(input_tensor, label, path, criterion=None, model=None):

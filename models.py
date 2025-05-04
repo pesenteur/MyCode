@@ -25,7 +25,8 @@ class CustomMultiheadAttention(nn.MultiheadAttention):
         super(CustomMultiheadAttention, self).__init__(embed_dim, num_heads, **kwargs)
         self.gate_dim = embed_dim  # 门机制的维度，如果为 None 则不启用门
         self.gate_fc = nn.Linear(embed_dim, embed_dim)
-        self.two_dim_bias = torch.tensor(load_path_data(), dtype=torch.float32)
+        # self.two_dim_bias = torch.tensor(load_path_data(), dtype=torch.float32)
+        self.register_buffer("two_dim_bias", torch.tensor(load_path_data(), dtype=torch.float32))
         self.a = nn.Parameter(torch.tensor(0.5))  # 默认值为 0.5
         self.b = 1.0 - self.a  # b 是 1 - a，保证 a + b = 1
 
@@ -129,8 +130,8 @@ class MSIN(nn.Module):
         self.feature = None
         
         edge_index, edge_attr = load_graph_data()
-        self.edge_index = edge_index
-        self.edge_attr = edge_attr
+        self.edge_index = edge_index.to(next(self.parameters()).device)
+        self.edge_attr = edge_attr.to(next(self.parameters()).device)
 
     def forward(self, graphs,path):
         cnn_out = self.cnn_encoder(graphs)  # shape: (7, 1, 180, 180)
