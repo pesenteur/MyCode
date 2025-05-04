@@ -147,7 +147,7 @@ class MSIN(nn.Module):
 
         
         out = self.inter_graph(branch_outputs)
-        out = self.sageconv(out, random_neighbor_sampling(self.edge_index,self.edge_attr))
+        out = self.sageconv(out, random_neighbor_sampling(self.edge_index, self.edge_attr).to(out.device))
 
         out = self.fc(out)
         self.feature = out

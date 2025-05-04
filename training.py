@@ -31,7 +31,7 @@ def train(input_tensor, label, path, criterion=None, model=None):
     b_nmi = 0
     b_ars = 0
     if criterion is None:
-        criterion = MobilityLoss()
+        criterion = MobilityLoss().to(device)
     if model is None:
         num_branches = 8
         #region 
@@ -41,7 +41,7 @@ def train(input_tensor, label, path, criterion=None, model=None):
         final_output_dim = 144
         num_heads = 8
         epochs = 2000
-        model = MSIN(num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads)
+        model = MSIN(num_branches, input_dim, hidden_dim, branch_output_dim, final_output_dim, num_heads).to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=0.0005, weight_decay=5e-4)
     for epoch in range(epochs):
