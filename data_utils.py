@@ -10,7 +10,7 @@ from torch_geometric.utils import from_scipy_sparse_matrix
 import numpy as np
 import scipy.sparse as sp
 from parse_args import args
-data_path = args.data_path
+
 
 def standardize_matrix(matrix):
     # 计算每列的均值和标准差
@@ -22,11 +22,13 @@ def standardize_matrix(matrix):
     return standardized_matrix
 
 def load_path_data():
+    data_path = args.data_path
     path_p = np.load(data_path+'/path_p.npy')
     path_p = standardize_matrix(path_p)
     return path_p.reshape(1, 180, 180)
 
 def load_graph_data():
+    data_path = args.data_path
     adj_matrix = np.load(data_path+'/adjacency.npy')
     path_p = np.load(data_path+'/path_p.npy')
     adj_matrix_sparse = sp.coo_matrix(adj_matrix*path_p)

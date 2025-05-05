@@ -5,7 +5,7 @@ from sklearn import linear_model
 from sklearn.model_selection import KFold
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score, r2_score, mean_squared_error, mean_absolute_error
 from parse_args import args
-data_path = args.data_path
+
 
 def compute_metrics(y_pred, y_test):
     y_pred[y_pred < 0] = 0
@@ -56,7 +56,7 @@ def classify_land_usage(emb, display=False):
     return nmi, ars
 
 def perform_evaluation(embs, display=True):
-
+    data_path = args.data_path
     if display:
         print("### Crime Prediction ###")
     crime_label = np.load(data_path+"/crime_counts.npy", allow_pickle=True)
