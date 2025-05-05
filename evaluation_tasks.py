@@ -4,6 +4,8 @@ from sklearn.cluster import KMeans
 from sklearn import linear_model
 from sklearn.model_selection import KFold
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score, r2_score, mean_squared_error, mean_absolute_error
+from parse_args import args
+data_path = args.data_path
 
 def compute_metrics(y_pred, y_test):
     y_pred[y_pred < 0] = 0
@@ -54,34 +56,29 @@ def classify_land_usage(emb, display=False):
     return nmi, ars
 
 def perform_evaluation(embs, display=True):
-    if display:
-        print("### Popularity Prediction ###")
-    population_label = np.load("./Data_180/population.npy", allow_pickle=True)
-    pop_mae, pop_rmse, pop_r2 = evaluate_predictions(embs, population_label, display=display)
 
     if display:
         print("### Crime Prediction ###")
-    crime_label = np.load("./Data_180/crime_counts.npy", allow_pickle=True)
+    crime_label = np.load(data_path+"/crime_counts.npy", allow_pickle=True)
     cri_mae, cri_rmse, cri_r2 = evaluate_predictions(embs, crime_label, display=display)
 
     if display:
         print("### Call Prediction ###")
-    call_label = np.load("./Data_180/serviceCall_counts.npy", allow_pickle=True)
+    call_label = np.load(data_path+"/serviceCall_counts.npy", allow_pickle=True)
     call_mae, call_rmse, call_r2 = evaluate_predictions(embs, call_label, display=display)
 
     if display:
         print("### Check-in Prediction ###")
-    check_in_label = np.load("./Data_180/check_in.npy")
+    check_in_label = np.load(data_path+"/check_in.npy")
     check_mae, check_rmse, check_r2 = evaluate_predictions(embs, check_in_label, display=display)
 
-    if display:
-        print("### Land Usage Prediction ###")
-    nmi, ars = classify_land_usage(embs, display=display)
+    # if display:
+    #     print("### Land Usage Prediction ###")
+    # nmi, ars = classify_land_usage(embs, display=display)
 
     if display:
         print("### Summary ###")
         # print(f"Popularity Prediction - MAE: {pop_mae:.2f}, RMSE: {pop_rmse:.2f}, R2: {pop_r2:.4f}")
         print(f"Check-in Prediction - MAE: {check_mae:.2f}, RMSE: {check_rmse:.2f}, R2: {check_r2:.4f}")
-        print(f"Land Usage Prediction - NMI: {nmi:.4f}, ARS: {ars:.4f}")
 
-    return cri_mae, cri_rmse, cri_r2, call_mae, call_rmse, call_r2,check_mae, check_rmse, check_r2, nmi, ars
+    return cri_mae, cri_rmse, cri_r2, call_mae, call_rmse, call_r2,check_mae, check_rmse, check_r2
