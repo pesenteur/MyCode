@@ -39,7 +39,7 @@ def train(input_tensor, label, path, criterion=None, model=None):
         loss.backward()
         optimizer.step()
         embs = model.get_features()
-        embs = embs.detach().numpy()
+        embs = embs.detach().cpu().numpy()
 
         if epoch %25 == 0:
             print(f"\nEpoch {epoch}, Loss {loss.item()}")
