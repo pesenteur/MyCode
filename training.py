@@ -12,9 +12,9 @@ print("Using device:", device)
 
 
 def train(input_tensor, label, path, criterion=None, model=None):
-    b_check_r2 = 0
-    b_crime_r2 = 0
-    b_call_r2 = 0
+    b_check_r2,b_check_mae,b_check_rmse = 0,0,0
+    b_crime_r2,b_cri_mae,b_cri_mae = 0,0,0
+    b_call_r2,b_call_mae,b_call_rmse = 0,0,0
     b_nmi = 0
     b_ars = 0
     if criterion is None:
@@ -41,7 +41,7 @@ def train(input_tensor, label, path, criterion=None, model=None):
         embs = model.get_features()
         embs = embs.detach().cpu().numpy()
 
-        if epoch %25 == 0:
+        if epoch %50 == 0:
             print(f"\nEpoch {epoch}, Loss {loss.item()}")
             cri_mae, cri_rmse, cri_r2, call_mae, call_rmse, call_r2,check_mae, check_rmse, check_r2 = perform_evaluation(embs,True)
         else:
@@ -55,15 +55,21 @@ def train(input_tensor, label, path, criterion=None, model=None):
             #     writer.writerow(results)
         if cri_r2>b_crime_r2:
             b_crime_r2 = cri_r2
+            b_cri_mae = cri_mae
+            b_cri_rmse = cri_rmse
         if call_r2>b_call_r2:
             b_call_r2=call_r2
+            b_call_mae = call_mae
+            b_call_rmse = call_rmse
         if check_r2>b_check_r2:
             b_check_r2=check_r2
+            b_check_rmse = check_rmse
+            b_check_mae = check_mae
 
     print("### Best ###")
-    print(f"check-in Prediction -  R2: {b_check_r2:.4f}")
-    print(f"crime Prediction - R2: {b_crime_r2:.4f}")
-    print(f"call Prediction - R2: {b_call_r2:.4f}")
+    print(f"check-in Prediction - MAE:{b_check_mae:.4f} , RMSE:{b_check_rmse:.4f}  R2: {b_check_r2:.4f}")
+    print(f"crime Prediction - MAE:{b_cri_mae:.4f} , RMSE:{b_cri_rmse:.4f} R2: {b_crime_r2:.4f}")
+    print(f"call Prediction - MAE:{b_call_mae:.4f} , RMSE:{b_call_rmse:.4f} R2: {b_call_r2:.4f}")
 
 
 if __name__ == '__main__':

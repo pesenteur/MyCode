@@ -132,6 +132,7 @@ class MSIN(nn.Module):
         edge_index, edge_attr = load_graph_data()
         self.edge_index = edge_index.to(next(self.parameters()).device)
         self.edge_attr = edge_attr.to(next(self.parameters()).device)
+        
 
     def forward(self, graphs,path):
         cnn_out = self.cnn_encoder(graphs)  # shape: (7, 1, 180, 180)
