@@ -98,13 +98,13 @@ class IntraGraph(nn.Module):
         return x
 
 class InterGraph(nn.Module):
-    def __init__(self, branch_output_dim, num_heads, num_layers):
+    def __init__(self, branch_output_dim, num_heads,num_branches, num_layers):
         super(InterGraph, self).__init__()
         self.transformer_encoder = nn.TransformerEncoder(
             nn.TransformerEncoderLayer(d_model=branch_output_dim, nhead=num_heads),
             num_layers=num_layers
         )
-        self.final_norm = nn.LayerNorm(branch_output_dim * num_heads)
+        self.final_norm = nn.LayerNorm(branch_output_dim * num_branches)
         
     def forward(self, branch_outputs):
         # branch_outputs: (batch_size, num_branches, branch_output_dim)
@@ -120,7 +120,7 @@ class MSIN(nn.Module):
         super(MSIN, self).__init__()
         self.cnn_encoder = MobilityCNN(in_channels=3, out_channels=1)
         self.branches = nn.ModuleList([IntraGraph(input_dim, hidden_dim, branch_output_dim, num_heads, 4) for _ in range(num_branches)])
-        self.inter_graph = InterGraph(branch_output_dim, num_heads, num_layers=4)
+        self.inter_graph = InterGraph(branch_output_dim, num_heads,num_branches, num_layers=4)
         self.dropout = nn.Dropout(p=0.5)
         self.sageconv = GraphSAGEModel(branch_output_dim * num_branches, final_output_dim*2, final_output_dim)
 
